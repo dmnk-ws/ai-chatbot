@@ -2,6 +2,7 @@ import {
   ChangeEvent,
   Dispatch,
   FormEvent,
+  KeyboardEvent,
   SetStateAction,
   useCallback,
   useMemo,
@@ -22,6 +23,7 @@ interface UseChatReturn {
   isLoading: boolean;
   handleSubmit: (e: FormEvent) => Promise<void>;
   handleChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  handleEnter: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
   setMessages: Dispatch<SetStateAction<Message[]>>;
 }
 
@@ -115,6 +117,16 @@ export function useChat({
     setInput(e.target.value);
   }, []);
 
+  const handleEnter = useCallback(
+    (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit(e as unknown as FormEvent);
+      }
+    },
+    [handleSubmit],
+  );
+
   return useMemo(
     () => ({
       messages,
@@ -122,8 +134,9 @@ export function useChat({
       isLoading,
       handleSubmit,
       handleChange,
+      handleEnter,
       setMessages,
     }),
-    [messages, input, isLoading, handleSubmit, handleChange],
+    [messages, input, isLoading, handleSubmit, handleChange, handleEnter],
   );
 }

@@ -12,7 +12,7 @@ import { markdownComponents } from "./markdown-components";
 
 function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages, input, handleSubmit, handleChange } = useChat({
+  const { messages, input, handleSubmit, handleChange, handleEnter } = useChat({
     provider: "mistral",
     model: "mistral-large-latest",
   });
@@ -67,6 +67,7 @@ function Chat() {
                 placeholder="Write a message..."
                 onChange={handleChange}
                 value={input}
+                onKeyDown={handleEnter}
               ></textarea>
             </div>
             <div className="flex items-center justify-end">
