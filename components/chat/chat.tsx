@@ -9,6 +9,7 @@ import Button from "@/components/elements/Button";
 import { useChat } from "@/hooks/useChat";
 
 import { markdownComponents } from "./markdown-components";
+import Welcome from "./welcome";
 
 function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -22,38 +23,42 @@ function Chat() {
   }, [messages]);
 
   return (
-    <main className="flex min-h-screen w-full">
-      <div className="flex flex-col flex-1 mx-auto min-w-0 max-w-4xl">
-        <div className="flex flex-col py-4 gap-4 px-4 h-full overflow-auto">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex flex-row justify-center rounded-2xl px-2 ${
-                msg.role === "user" && "bg-blue-500 self-end max-w-[70%]"
-              }`}
-            >
-              {msg.role === "assistant" && (
-                <div className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-3xl  py-2 px-3 m-2">
-                  <MagicWandIcon className="w-5 h-5 rounded-full" />
-                </div>
-              )}
+    <main className="flex w-full h-full overflow-hidden">
+      <div className="flex flex-col flex-1 mx-auto min-w-0 max-w-4xl h-full">
+        <div className="flex flex-col py-4 gap-4 px-4 flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            <Welcome />
+          ) : (
+            messages.map((msg, idx) => (
               <div
-                className={`${msg.role === "user" ? "py-2 px-3 text-white" : "pl-2 pr-8 pb-8 pt-2"}`}
+                key={idx}
+                className={`flex flex-row justify-center rounded-2xl px-2 ${
+                  msg.role === "user" && "bg-blue-500 self-end max-w-[70%]"
+                }`}
               >
-                <Markdown
-                  remarkPlugins={[remarkGfm]}
-                  components={msg.role !== "user" ? markdownComponents : null}
+                {msg.role === "assistant" && (
+                  <div className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-3xl  py-2 px-3 m-2">
+                    <MagicWandIcon className="w-5 h-5 rounded-full" />
+                  </div>
+                )}
+                <div
+                  className={`${msg.role === "user" ? "py-2 px-3 text-white" : "pl-2 pr-8 pb-8 pt-2"}`}
                 >
-                  {msg.role === "assistant"
-                    ? msg.content.replace(
-                        /^([\p{Emoji}\p{Emoji_Presentation}])\s+(.+)$/gmu,
-                        "\n $1 $2",
-                      )
-                    : msg.content}
-                </Markdown>
+                  <Markdown
+                    remarkPlugins={[remarkGfm]}
+                    components={msg.role !== "user" ? markdownComponents : null}
+                  >
+                    {msg.role === "assistant"
+                      ? msg.content.replace(
+                          /^([\p{Emoji}\p{Emoji_Presentation}])\s+(.+)$/gmu,
+                          "\n $1 $2",
+                        )
+                      : msg.content}
+                  </Markdown>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
           <div ref={messagesEndRef} />
         </div>
         <div className="sticky bottom-0 w-full mx-auto min-w-0 max-w-4xl px-2 pb-3 md:px-4 md:pb-4 bg-white">
@@ -71,7 +76,7 @@ function Chat() {
               ></textarea>
             </div>
             <div className="flex items-center justify-end">
-              <Button type="submit">
+              <Button type="submit" disabled={input?.trim() === ""}>
                 <ArrowUpIcon className="w-4 h-4 text-black" />
               </Button>
             </div>
