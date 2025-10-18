@@ -1,4 +1,4 @@
-import { ViewVerticalIcon } from "@radix-ui/react-icons";
+import { PanelLeft } from "lucide-react";
 import React from "react";
 
 import SidebarHeader from "@/components/sidebar/sidebar-header";
@@ -16,7 +16,7 @@ function DesktopSidebar({ open, onClick }: DesktopSidebarProps) {
       <SidebarHeader
         open={open}
         onClick={onClick}
-        icon={<ViewVerticalIcon className="w-4 h-4 text-black" />}
+        icon={<PanelLeft className="w-4 h-4 text-black" />}
       />
     </nav>
   );

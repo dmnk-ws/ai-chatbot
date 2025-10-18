@@ -1,4 +1,4 @@
-import { Cross2Icon, ViewVerticalIcon } from "@radix-ui/react-icons";
+import { PanelLeft, X } from "lucide-react";
 import React from "react";
 
 import Button from "@/components/elements/Button";
@@ -14,7 +14,7 @@ function MobileSidebar({ open, onClick }: MobileSidebarProps) {
     <>
       <nav className="flex p-2 md:hidden">
         <Button onClick={onClick}>
-          <ViewVerticalIcon className="w-4 h-4 text-black" />
+          <PanelLeft className="w-4 h-4 text-black" />
         </Button>
       </nav>
       <div
@@ -23,7 +23,7 @@ function MobileSidebar({ open, onClick }: MobileSidebarProps) {
         <SidebarHeader
           open={open}
           onClick={onClick}
-          icon={<Cross2Icon className="w-4 h-4 text-black" />}
+          icon={<X className="w-4 h-4 text-black" />}
         />
       </div>
     </>
