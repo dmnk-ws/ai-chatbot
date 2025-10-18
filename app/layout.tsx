@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ReactNode } from "react";
 
+import { ModelProvider } from "@/contexts/ModelContext";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ModelProvider>{children}</ModelProvider>
       </body>
     </html>
   );

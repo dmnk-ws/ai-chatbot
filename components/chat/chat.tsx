@@ -4,15 +4,17 @@ import React, { useEffect, useRef } from "react";
 
 import ChatForm from "@/components/chat/chat-form";
 import Message from "@/components/chat/message";
+import { useModel } from "@/contexts/ModelContext";
 import { useChat } from "@/hooks/useChat";
 
 import Welcome from "./welcome";
 
 function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { selectedModel, selectedProvider } = useModel();
   const { messages, input, handleSubmit, handleChange, handleEnter } = useChat({
-    provider: "mistral",
-    model: "mistral-large-latest",
+    provider: selectedProvider,
+    model: selectedModel,
   });
 
   useEffect(() => {

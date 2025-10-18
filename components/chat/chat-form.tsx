@@ -1,6 +1,7 @@
 import { ArrowUp } from "lucide-react";
 import React from "react";
 
+import ModelSelect from "@/components/chat/model-select";
 import Button from "@/components/elements/Button";
 
 interface ChatFormProps {
@@ -32,6 +33,7 @@ function ChatForm({
         />
       </div>
       <div className="flex items-center justify-between gap-4">
+        <ModelSelect />
         <Button type="submit" disabled={input?.trim() === ""}>
           <ArrowUp className="w-4 h-4 text-black" />
         </Button>

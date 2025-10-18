@@ -95,7 +95,6 @@ export function useChat({
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        console.log(value);
 
         assistantContent += value;
         setMessages((prev) => {
