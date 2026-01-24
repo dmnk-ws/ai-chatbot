@@ -1,14 +1,6 @@
-import { BaseProvider, Message } from "@/lib/ai/core/base-provider";
+import { BaseProvider } from "@/lib/ai/core/base-provider";
 
-class MistralProvider extends BaseProvider {
-  public async chat(
-    model: string = "mistral-large-latest",
-    messages: Message[] = [],
-    stream: boolean = false,
-  ): Promise<ReadableStream> {
-    return await super.chat(model, messages, stream);
-  }
-
+export class MistralProvider extends BaseProvider {
   protected getAuthHeaders(): Record<string, string> {
     return { Authorization: `Bearer ${process.env.MISTRAL_API_KEY || ""}` };
   }
@@ -17,5 +9,3 @@ class MistralProvider extends BaseProvider {
     return "https://api.mistral.ai/v1";
   }
 }
-
-export const mistral = new MistralProvider();

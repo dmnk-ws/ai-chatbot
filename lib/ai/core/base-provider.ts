@@ -1,13 +1,4 @@
-export interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export interface ProviderConfig {
-  baseUrl?: string;
-  apiKey?: string;
-  headers?: Record<string, string>;
-}
+import type { Message, ProviderConfig } from "@/lib/ai/types";
 
 export abstract class BaseProvider {
   protected baseUrl?: string;
@@ -47,12 +38,17 @@ export abstract class BaseProvider {
   protected abstract getAuthHeaders(): Record<string, string>;
 
   protected pipe(response: ReadableStream): ReadableStream {
+    let buffer = "";
+
     return response
       .pipeThrough(new TextDecoderStream())
       .pipeThrough(
         new TransformStream({
           transform(chunk, controller) {
-            const lines = chunk.split("\n");
+            buffer += chunk;
+            const lines = buffer.split("\n");
+
+            buffer = lines.pop() || "";
 
             for (const line of lines) {
               if (line.startsWith("data: ")) {
@@ -63,6 +59,20 @@ export abstract class BaseProvider {
                   const content = parsed.choices?.[0]?.delta?.content || "";
 
                   if (content) controller.enqueue(content);
+                }
+              }
+            }
+          },
+          flush(controller) {
+            if (buffer.startsWith("data: ")) {
+              const data = buffer.slice(6).trim();
+              if (data && data !== "[DONE]") {
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices?.[0]?.delta?.content || "";
+                  if (content) controller.enqueue(content);
+                } catch (error) {
+                  console.error(error);
                 }
               }
             }

@@ -4,7 +4,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { markdownComponents } from "@/components/chat/markdown-components";
-import type { Message as MessageType } from "@/lib/ai/core/base-provider";
+import type { Message as MessageType } from "@/lib/ai/types";
 
 function Message({ role, content }: MessageType) {
   const isUser = role === "user";

@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { Message } from "@/lib/ai/core/base-provider";
+import type { Message } from "@/lib/ai/types";
 
 interface UseChatOptions {
   initialMessages?: Message[];

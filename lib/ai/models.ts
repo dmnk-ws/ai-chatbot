@@ -1,38 +1,34 @@
-export interface Model {
-  model: string;
-  name: string;
-  provider: string;
-}
+import { Model, Provider } from "@/lib/ai/types";
 
 export const models: Model[] = [
   {
     model: "gpt-4.1",
     name: "GPT-4.1",
-    provider: "OpenAI",
+    provider: Provider.OPENAI,
   },
   {
     model: "o4-mini",
     name: "o4-mini",
-    provider: "OpenAI",
+    provider: Provider.OPENAI,
   },
   {
     model: "gpt-5",
     name: "GPT-5",
-    provider: "OpenAI",
+    provider: Provider.OPENAI,
   },
   {
     model: "claude-sonnet-4-5",
     name: "Claude Sonnet 4.5",
-    provider: "Anthropic",
+    provider: Provider.ANTHROPIC,
   },
   {
     model: "claude-opus",
     name: "Claude Opus 4",
-    provider: "Anthropic",
+    provider: Provider.ANTHROPIC,
   },
   {
     model: "mistral-large-latest",
     name: "Mistral",
-    provider: "Mistral",
+    provider: Provider.MISTRAL,
   },
 ];

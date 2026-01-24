@@ -1,6 +1,7 @@
-import { BaseProvider, Message } from "@/lib/ai/core/base-provider";
+import { BaseProvider } from "@/lib/ai/core/base-provider";
+import type { Message } from "@/lib/ai/types";
 
-class AnthropicProvider extends BaseProvider {
+export class AnthropicProvider extends BaseProvider {
   public async chat(
     model: string = "claude-sonnet-4-5",
     messages: Message[] = [],
@@ -26,7 +27,3 @@ class AnthropicProvider extends BaseProvider {
     return "https://api.anthropic.com/v1";
   }
 }
-
-export const anthropic = new AnthropicProvider({
-  headers: { "anthropic-version": "2023-06-01" },
-});
