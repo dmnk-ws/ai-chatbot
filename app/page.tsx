@@ -1,11 +1,5 @@
-import Chat from "@/components/chat/chat";
-import Sidebar from "@/components/sidebar/sidebar";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
-      <Sidebar />
-      <Chat />
-    </div>
-  );
+  redirect("/new");
 }
