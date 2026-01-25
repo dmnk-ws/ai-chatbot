@@ -63,20 +63,6 @@ export abstract class BaseProvider {
               }
             }
           },
-          flush(controller) {
-            if (buffer.startsWith("data: ")) {
-              const data = buffer.slice(6).trim();
-              if (data && data !== "[DONE]") {
-                try {
-                  const parsed = JSON.parse(data);
-                  const content = parsed.choices?.[0]?.delta?.content || "";
-                  if (content) controller.enqueue(content);
-                } catch (error) {
-                  console.error(error);
-                }
-              }
-            }
-          },
         }),
       )
       .pipeThrough(new TextEncoderStream());
