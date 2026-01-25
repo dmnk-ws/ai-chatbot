@@ -2,6 +2,11 @@ import { Model, Provider } from "@/lib/ai/types";
 
 export const models: Model[] = [
   {
+    model: "mistral-large-latest",
+    name: "Mistral",
+    provider: Provider.MISTRAL,
+  },
+  {
     model: "gpt-4.1",
     name: "GPT-4.1",
     provider: Provider.OPENAI,
@@ -25,10 +30,5 @@ export const models: Model[] = [
     model: "claude-opus",
     name: "Claude Opus 4",
     provider: Provider.ANTHROPIC,
-  },
-  {
-    model: "mistral-large-latest",
-    name: "Mistral",
-    provider: Provider.MISTRAL,
   },
 ];
