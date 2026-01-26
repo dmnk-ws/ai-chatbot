@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ReactNode } from "react";
 
-import Sidebar from "@/components/sidebar/sidebar";
 import { ModelProvider } from "@/contexts/ModelContext";
 
 import "./globals.css";
@@ -32,12 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ModelProvider>
-          <div className="flex flex-col md:flex-row h-screen overflow-hidden">
-            <Sidebar />
-            {children}
-          </div>
-        </ModelProvider>
+        <ModelProvider>{children}</ModelProvider>
       </body>
     </html>
   );
