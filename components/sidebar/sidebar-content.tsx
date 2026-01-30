@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React from "react";
 
 import UserArea from "@/components/sidebar/user-area";
 import UserAvatarButton from "@/components/sidebar/user-avatar-button";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarContentProps {
   open: boolean;
@@ -12,9 +12,7 @@ interface SidebarContentProps {
 
 function SidebarContent({ open }: SidebarContentProps) {
   const router = useRouter();
-  const user = { name: "John Doe", email: "john.doe@example.org" };
-  const isAuthenticated = false;
-  const logout = () => {};
+  const { user, isAuthenticated, logout } = useAuth();
 
   const handleLoginClick = () => {
     router.push("/login");

@@ -1,5 +1,11 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
+
 import { AuthType } from "@/components/auth/types";
 import Input from "@/components/elements/Input";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AuthProps {
   mode: AuthType;
@@ -26,11 +32,25 @@ function Footer({ mode }: Readonly<AuthProps>) {
 }
 
 export default function Auth({ mode }: Readonly<AuthProps>) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth();
+  const router = useRouter();
+
   const header = mode === AuthType.SIGN_IN ? "Sign In" : "Sign Up";
   const subheader =
     mode === AuthType.SIGN_IN
       ? "Use your email and password to sign in"
       : "Create an account with your email and password";
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    if (mode === AuthType.SIGN_IN) {
+      login(email, password);
+      router.push("/");
+    }
+  };
 
   return (
     <div className="flex flex-col gap-12 w-120 pt-12 justify-start mr-auto ml-auto min-h-screen md:pt-0 md:justify-center">
@@ -39,7 +59,10 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
           <h1 className="font-semibold text-xl">{header}</h1>
           <h2 className="text-gray-500 text-sm">{subheader}</h2>
         </div>
-        <form className="flex flex-col gap-4 px-4 sm:px-16">
+        <form
+          className="flex flex-col gap-4 px-4 sm:px-16"
+          onSubmit={handleSubmit}
+        >
           <div className="flex flex-col gap-2">
             <label className="text-sm text-zinc-600" htmlFor="email">
               Email Address
@@ -50,6 +73,8 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
               id="email"
               placeholder="user@acme.com"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -61,6 +86,8 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
               id="password"
               placeholder="********"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <button
