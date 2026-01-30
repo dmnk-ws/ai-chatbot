@@ -2,6 +2,7 @@ import { PanelLeft, X } from "lucide-react";
 import React from "react";
 
 import Button from "@/components/elements/Button";
+import SidebarContent from "@/components/sidebar/sidebar-content";
 import SidebarHeader from "@/components/sidebar/sidebar-header";
 
 interface MobileSidebarProps {
@@ -25,6 +26,7 @@ function MobileSidebar({ open, onClick }: MobileSidebarProps) {
           onClick={onClick}
           icon={<X className="w-4 h-4 text-black" />}
         />
+        <SidebarContent open={open} />
       </div>
     </>
   );
