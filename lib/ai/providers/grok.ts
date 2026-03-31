@@ -3,15 +3,15 @@ import type { Message } from "@/lib/ai/types";
 
 export class GrokProvider extends BaseProvider {
   public async chat(
-    model: string = "grok-4-1-fast",
+    model: string = "grok-4.20-reasoning",
     messages: Message[] = [],
     stream: boolean = false,
   ): Promise<ReadableStream> {
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    const response = await fetch(`${this.baseUrl}/v1/responses`, {
       method: "POST",
       body: JSON.stringify({
         model,
-        messages,
+        input: messages,
         stream,
         store: false,
       }),
@@ -25,7 +25,7 @@ export class GrokProvider extends BaseProvider {
   }
 
   protected getAuthHeaders(): Record<string, string> {
-    return { Authorization: `Bearer ${process.env.GROK_API_KEY || ""}` };
+    return { Authorization: `Bearer ${process.env.XAI_API_KEY || ""}` };
   }
 
   protected getBaseURL(): string {
