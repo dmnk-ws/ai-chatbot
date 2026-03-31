@@ -19,9 +19,11 @@ export enum Provider {
   ANTHROPIC = "Anthropic",
   OPENAI = "OpenAI",
   MISTRAL = "Mistral",
+  XAI = "Grok",
 }
 
 export type ProviderName =
   | Provider.ANTHROPIC
   | Provider.OPENAI
-  | Provider.MISTRAL;
+  | Provider.MISTRAL
+  | Provider.XAI;

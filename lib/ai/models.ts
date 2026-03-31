@@ -31,4 +31,9 @@ export const models: Model[] = [
     name: "Claude Opus 4",
     provider: Provider.ANTHROPIC,
   },
+  {
+    model: "grok-4-1-fast",
+    name: "Grok 4",
+    provider: Provider.XAI,
+  },
 ];

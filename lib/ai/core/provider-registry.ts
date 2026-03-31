@@ -1,5 +1,6 @@
 import { BaseProvider } from "@/lib/ai/core/base-provider";
 import { AnthropicProvider } from "@/lib/ai/providers/anthropic";
+import { GrokProvider } from "@/lib/ai/providers/grok";
 import { MistralProvider } from "@/lib/ai/providers/mistral";
 import { OpenAIProvider } from "@/lib/ai/providers/openai";
 import { Provider, ProviderName } from "@/lib/ai/types";
@@ -16,6 +17,8 @@ function createProvider(name: ProviderName): BaseProvider {
       return new OpenAIProvider();
     case Provider.MISTRAL:
       return new MistralProvider();
+    case Provider.XAI:
+      return new GrokProvider();
   }
 }
 
