@@ -13,7 +13,9 @@ function Message({ role, content }: MessageType) {
   return (
     <div
       className={`flex flex-row rounded-2xl px-2 ${
-        isUser ? "justify-center bg-blue-500 self-end max-w-[70%]" : "justify-start"
+        isUser
+          ? "justify-center bg-blue-500 self-end max-w-[70%]"
+          : "justify-start"
       }`}
     >
       {isAssistant && (

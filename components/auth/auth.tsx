@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { SyntheticEvent, useState } from "react";
 
 import { AuthType } from "@/components/auth/types";
 import Input from "@/components/elements/Input";
@@ -32,9 +32,13 @@ function Footer({ mode }: Readonly<AuthProps>) {
 }
 
 export default function Auth({ mode }: Readonly<AuthProps>) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { login, register } = useAuth();
   const router = useRouter();
 
   const header = mode === AuthType.SIGN_IN ? "Sign In" : "Sign Up";
@@ -43,12 +47,26 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
       ? "Use your email and password to sign in"
       : "Create an account with your email and password";
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-
-    if (mode === AuthType.SIGN_IN) {
-      login(email, password);
-      router.push("/");
+    setError(null);
+    setIsLoading(true);
+    try {
+      if (mode === AuthType.SIGN_IN) {
+        await login(email, password);
+        router.push("/");
+      } else {
+        await register(email, password, firstName, lastName);
+        router.push("/login");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong, please try again",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,6 +81,38 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
           className="flex flex-col gap-4 px-4 sm:px-16"
           onSubmit={handleSubmit}
         >
+          {mode === AuthType.SIGN_UP && (
+            <>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-zinc-600" htmlFor="firstName">
+                  First Name
+                </label>
+                <Input
+                  type="text"
+                  autoComplete="given-name"
+                  id="firstName"
+                  placeholder="Jane"
+                  name="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-zinc-600" htmlFor="lastName">
+                  Last Name
+                </label>
+                <Input
+                  type="text"
+                  autoComplete="family-name"
+                  id="lastName"
+                  placeholder="Smith"
+                  name="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </>
+          )}
           <div className="flex flex-col gap-2">
             <label className="text-sm text-zinc-600" htmlFor="email">
               Email Address
@@ -91,12 +141,18 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
             />
           </div>
           <button
-            className="py-2 px-4 bg-black text-white text-sm font-medium rounded-md cursor-pointer hover:opacity-80"
-            aria-disabled="false"
+            className={`py-2 px-4 bg-black text-white text-sm font-medium rounded-md cursor-pointer hover:opacity-80 ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+            aria-disabled={isLoading}
             type="submit"
+            disabled={isLoading}
           >
-            {header}
+            {isLoading
+              ? mode === AuthType.SIGN_IN
+                ? "Signing in..."
+                : "Creating account..."
+              : header}
           </button>
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <Footer mode={mode} />
         </form>
       </div>

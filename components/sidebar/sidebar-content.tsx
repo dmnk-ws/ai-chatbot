@@ -36,7 +36,10 @@ function SidebarContent({ open }: SidebarContentProps) {
     <div className="flex flex-col flex-1 min-h-0">
       <div className="mt-auto pt-2 border-t border-gray-200">
         {isAuthenticated ? (
-          <UserArea onClick={logout} name={user.name} />
+          <UserArea
+            onClick={logout}
+            name={`${user.firstName} ${user.lastName}`}
+          />
         ) : (
           <UserArea onClick={handleLoginClick} />
         )}
