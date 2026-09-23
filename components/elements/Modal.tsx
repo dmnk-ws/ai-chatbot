@@ -1,7 +1,10 @@
 "use client";
 
+import { X } from "lucide-react";
 import React, { ReactNode, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
+
+import Button from "@/components/elements/Button";
 
 interface ModalProps {
   open: boolean;
@@ -79,9 +82,16 @@ export default function Modal({
         className="flex flex-col gap-4 w-full max-w-sm p-6 rounded-2xl bg-white shadow-lg focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id={titleId} className="text-lg font-semibold">
-          {title}
-        </h2>
+        <div className="flex items-start justify-between gap-4">
+          <h2 id={titleId} className="text-lg font-semibold">
+            {title}
+          </h2>
+          <div className="-mt-1 -mr-2">
+            <Button ariaLabel="Close" tooltip="top" onClick={onClose}>
+              <X className="w-4 h-4 text-black" />
+            </Button>
+          </div>
+        </div>
         {children && <div className="text-sm text-gray-600">{children}</div>}
         {actions && <div className="flex justify-end gap-2">{actions}</div>}
       </div>
