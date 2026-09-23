@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import Tooltip from "@/components/elements/Tooltip";
@@ -26,10 +26,20 @@ describe("Tooltip", () => {
   it("shows its label while the trigger has keyboard focus", () => {
     const trigger = renderTooltip();
 
-    fireEvent.focus(trigger);
+    fireEvent.keyDown(document, { key: "Tab" });
+    act(() => trigger.focus());
     expect(screen.getByText("Send message")).toBeTruthy();
 
-    fireEvent.blur(trigger);
+    act(() => trigger.blur());
+    expect(screen.queryByText("Send message")).toBeNull();
+  });
+
+  it("stays hidden when the trigger gets focus after a mouse action", () => {
+    const trigger = renderTooltip();
+
+    fireEvent.mouseDown(document.body);
+    act(() => trigger.focus());
+
     expect(screen.queryByText("Send message")).toBeNull();
   });
 
