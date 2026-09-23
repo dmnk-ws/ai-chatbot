@@ -12,3 +12,18 @@ export async function importChatApi(messages: Message[]): Promise<ChatSummary> {
 
   return (await res.json()) as ChatSummary;
 }
+
+export async function renameChatApi(
+  id: string,
+  title: string,
+): Promise<ChatSummary> {
+  const res = await fetch(`/api/chats/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+
+  if (!res.ok) throw new Error("Failed to rename chat");
+
+  return (await res.json()) as ChatSummary;
+}

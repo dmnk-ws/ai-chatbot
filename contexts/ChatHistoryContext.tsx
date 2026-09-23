@@ -14,6 +14,7 @@ interface ChatHistoryContextType {
   chats: ChatSummary[];
   addChat: (chat: ChatSummary) => void;
   touchChat: (id: string) => void;
+  renameChat: (id: string, title: string) => void;
   newChatKey: number;
   startNewChat: () => void;
   isCurrentNewChat: (key: number) => boolean;
@@ -48,6 +49,12 @@ export function ChatHistoryProvider({
     });
   }, []);
 
+  const renameChat = useCallback((id: string, title: string) => {
+    setChats((prev) =>
+      prev.map((chat) => (chat.id === id ? { ...chat, title } : chat)),
+    );
+  }, []);
+
   const startNewChat = useCallback(() => {
     newChatKeyRef.current += 1;
     setNewChatKey(newChatKeyRef.current);
@@ -65,6 +72,7 @@ export function ChatHistoryProvider({
         chats,
         addChat,
         touchChat,
+        renameChat,
         newChatKey,
         startNewChat,
         isCurrentNewChat,
