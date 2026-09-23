@@ -102,3 +102,19 @@ export async function addAssistantMessage(
     { $push: { messages: { role: "assistant", content } } },
   );
 }
+
+export async function renameChat(
+  userId: string,
+  chatId: string,
+  title: string,
+): Promise<void> {
+  if (!isValidObjectId(chatId)) throw new ChatNotFoundError(chatId);
+  await dbConnect();
+
+  const { matchedCount } = await Chat.updateOne(
+    { _id: chatId, userId },
+    { title },
+    { timestamps: false },
+  );
+  if (matchedCount === 0) throw new ChatNotFoundError(chatId);
+}

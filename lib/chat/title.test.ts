@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { chatTitle } from "@/lib/chat/title";
+import { chatTitle, normalizeTitle } from "@/lib/chat/title";
 
 describe("chatTitle", () => {
   it("keeps short text", () => {
@@ -17,5 +17,19 @@ describe("chatTitle", () => {
 
   it("falls back for empty text", () => {
     expect(chatTitle("   ")).toBe("New chat");
+  });
+});
+
+describe("normalizeTitle", () => {
+  it("trims and collapses whitespace", () => {
+    expect(normalizeTitle("  Trip\n\n  ideas  ")).toBe("Trip ideas");
+  });
+
+  it("caps the length", () => {
+    expect(normalizeTitle("a".repeat(150))).toBe("a".repeat(100));
+  });
+
+  it("returns null for an empty title", () => {
+    expect(normalizeTitle("   ")).toBeNull();
   });
 });

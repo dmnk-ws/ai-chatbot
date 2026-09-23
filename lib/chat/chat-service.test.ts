@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Message } from "@/lib/ai/types";
-import { ChatNotFoundError, addUserMessage } from "@/lib/chat/chat-service";
+import {
+  ChatNotFoundError,
+  addUserMessage,
+  renameChat,
+} from "@/lib/chat/chat-service";
 import Chat from "@/lib/db/models/Chat";
 
 vi.mock("@/lib/db/mongoose", () => ({ dbConnect: vi.fn() }));
@@ -61,6 +65,39 @@ describe("addUserMessage", () => {
     storedChat(null);
 
     await expect(addUserMessage("user-2", CHAT_ID, "ping")).rejects.toThrow(
+      ChatNotFoundError,
+    );
+    expect(Chat.updateOne).not.toHaveBeenCalled();
+  });
+});
+
+describe("renameChat", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("renames the user's chat without touching its activity time", async () => {
+    vi.mocked(Chat.updateOne).mockResolvedValue({ matchedCount: 1 } as never);
+
+    await renameChat("user-1", CHAT_ID, "Trip ideas");
+
+    expect(Chat.updateOne).toHaveBeenCalledWith(
+      { _id: CHAT_ID, userId: "user-1" },
+      { title: "Trip ideas" },
+      { timestamps: false },
+    );
+  });
+
+  it("rejects a chat the user does not own", async () => {
+    vi.mocked(Chat.updateOne).mockResolvedValue({ matchedCount: 0 } as never);
+
+    await expect(renameChat("user-2", CHAT_ID, "Trip ideas")).rejects.toThrow(
+      ChatNotFoundError,
+    );
+  });
+
+  it("rejects an invalid chat id", async () => {
+    await expect(renameChat("user-1", "nope", "Trip ideas")).rejects.toThrow(
       ChatNotFoundError,
     );
     expect(Chat.updateOne).not.toHaveBeenCalled();
