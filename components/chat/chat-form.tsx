@@ -34,7 +34,12 @@ function ChatForm({
       </div>
       <div className="flex items-center justify-between gap-4">
         <ModelSelect />
-        <Button type="submit" disabled={input?.trim() === ""}>
+        <Button
+          type="submit"
+          disabled={input?.trim() === ""}
+          ariaLabel="Send message"
+          tooltip="top"
+        >
           <ArrowUp className="w-4 h-4 text-black" />
         </Button>
       </div>

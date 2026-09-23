@@ -4,8 +4,11 @@ import { useRouter } from "next/navigation";
 import { SyntheticEvent, useState } from "react";
 
 import { AuthType } from "@/components/auth/types";
+import Button from "@/components/elements/Button";
 import Input from "@/components/elements/Input";
 import { useAuth } from "@/contexts/AuthContext";
+import { importChatApi } from "@/lib/chat/chat-api";
+import { clearGuestChat, loadGuestChat } from "@/lib/chat/guest-chat-storage";
 
 interface AuthProps {
   mode: AuthType;
@@ -31,6 +34,15 @@ function Footer({ mode }: Readonly<AuthProps>) {
   );
 }
 
+async function pathAfterLogin(): Promise<string> {
+  const guestMessages = loadGuestChat();
+  if (guestMessages.length === 0) return "/";
+
+  const { id } = await importChatApi(guestMessages);
+  clearGuestChat();
+  return `/chat/${id}`;
+}
+
 export default function Auth({ mode }: Readonly<AuthProps>) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -38,6 +50,7 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [importFailed, setImportFailed] = useState(false);
   const { login, register } = useAuth();
   const router = useRouter();
 
@@ -54,7 +67,12 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
     try {
       if (mode === AuthType.SIGN_IN) {
         await login(email, password);
-        router.push("/");
+        try {
+          router.push(await pathAfterLogin());
+        } catch {
+          setImportFailed(true);
+          setError("Signed in, but your chat couldn't be saved. Try again.");
+        }
       } else {
         await register(email, password, firstName, lastName);
         router.push("/login");
@@ -68,6 +86,11 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const continueWithoutGuestChat = () => {
+    clearGuestChat();
+    router.push("/new");
   };
 
   return (
@@ -153,6 +176,11 @@ export default function Auth({ mode }: Readonly<AuthProps>) {
               : header}
           </button>
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {importFailed && (
+            <Button variant="secondary" onClick={continueWithoutGuestChat}>
+              Continue without it
+            </Button>
+          )}
           <Footer mode={mode} />
         </form>
       </div>
