@@ -13,7 +13,13 @@ function SidebarHeader({ open, onClick, icon }: SidebarHeaderProps) {
     <header className="flex flex-row items-center justify-between w-full">
       {open && <h1 className="text-lg font-bold px-2">Chatbot</h1>}
       <div className="gap-2 cursor-pointer">
-        <Button onClick={onClick}>{icon}</Button>
+        <Button
+          ariaLabel={open ? "Close sidebar" : "Open sidebar"}
+          tooltip="right"
+          onClick={onClick}
+        >
+          {icon}
+        </Button>
       </div>
     </header>
   );

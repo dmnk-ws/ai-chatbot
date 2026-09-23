@@ -14,7 +14,7 @@ function MobileSidebar({ open, onClick }: MobileSidebarProps) {
   return (
     <>
       <nav className="flex p-2 md:hidden">
-        <Button onClick={onClick}>
+        <Button ariaLabel="Open sidebar" tooltip="right" onClick={onClick}>
           <PanelLeft className="w-4 h-4 text-black" />
         </Button>
       </nav>
@@ -26,7 +26,7 @@ function MobileSidebar({ open, onClick }: MobileSidebarProps) {
           onClick={onClick}
           icon={<X className="w-4 h-4 text-black" />}
         />
-        <SidebarContent open={open} />
+        <SidebarContent open={open} onNavigate={onClick} />
       </div>
     </>
   );
