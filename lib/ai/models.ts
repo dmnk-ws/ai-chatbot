@@ -2,7 +2,7 @@ import { Model, Provider } from "@/lib/ai/types";
 
 export const models: Model[] = [
   {
-    model: "mistral-small-latest",
+    model: "ministral-8b-latest",
     name: "Mistral",
     provider: Provider.MISTRAL,
   },
