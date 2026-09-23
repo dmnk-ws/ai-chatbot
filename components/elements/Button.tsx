@@ -3,7 +3,7 @@ import React, { ReactNode, Ref } from "react";
 import Tooltip, { TooltipSide } from "@/components/elements/Tooltip";
 
 export type ButtonVariant =
-  "icon" | "rowIcon" | "item" | "primary" | "secondary";
+  "icon" | "rowIcon" | "item" | "primary" | "secondary" | "danger";
 
 interface ButtonProps {
   children: ReactNode;
@@ -35,6 +35,10 @@ const VARIANTS: Record<ButtonVariant, { base: string; enabled: string }> = {
   secondary: {
     base: "py-2 px-4 rounded-md text-sm font-medium",
     enabled: "hover:bg-gray-100",
+  },
+  danger: {
+    base: "py-2 px-4 rounded-md text-sm font-medium bg-red-600 text-white",
+    enabled: "hover:bg-red-700",
   },
 };
 

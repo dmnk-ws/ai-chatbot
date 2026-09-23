@@ -27,3 +27,9 @@ export async function renameChatApi(
 
   return (await res.json()) as ChatSummary;
 }
+
+export async function deleteChatApi(id: string): Promise<void> {
+  const res = await fetch(`/api/chats/${id}`, { method: "DELETE" });
+
+  if (!res.ok) throw new Error("Failed to delete chat");
+}

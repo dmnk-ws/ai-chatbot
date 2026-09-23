@@ -4,13 +4,19 @@ import type { Message } from "@/lib/ai/types";
 import {
   ChatNotFoundError,
   addUserMessage,
+  deleteChat,
   renameChat,
 } from "@/lib/chat/chat-service";
 import Chat from "@/lib/db/models/Chat";
 
 vi.mock("@/lib/db/mongoose", () => ({ dbConnect: vi.fn() }));
 vi.mock("@/lib/db/models/Chat", () => ({
-  default: { findOne: vi.fn(), updateOne: vi.fn(), create: vi.fn() },
+  default: {
+    findOne: vi.fn(),
+    updateOne: vi.fn(),
+    deleteOne: vi.fn(),
+    create: vi.fn(),
+  },
 }));
 
 const CHAT_ID = "507f1f77bcf86cd799439011";
@@ -101,5 +107,37 @@ describe("renameChat", () => {
       ChatNotFoundError,
     );
     expect(Chat.updateOne).not.toHaveBeenCalled();
+  });
+});
+
+describe("deleteChat", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("deletes the user's chat", async () => {
+    vi.mocked(Chat.deleteOne).mockResolvedValue({ deletedCount: 1 } as never);
+
+    await deleteChat("user-1", CHAT_ID);
+
+    expect(Chat.deleteOne).toHaveBeenCalledWith({
+      _id: CHAT_ID,
+      userId: "user-1",
+    });
+  });
+
+  it("rejects a chat the user does not own", async () => {
+    vi.mocked(Chat.deleteOne).mockResolvedValue({ deletedCount: 0 } as never);
+
+    await expect(deleteChat("user-2", CHAT_ID)).rejects.toThrow(
+      ChatNotFoundError,
+    );
+  });
+
+  it("rejects an invalid chat id", async () => {
+    await expect(deleteChat("user-1", "nope")).rejects.toThrow(
+      ChatNotFoundError,
+    );
+    expect(Chat.deleteOne).not.toHaveBeenCalled();
   });
 });

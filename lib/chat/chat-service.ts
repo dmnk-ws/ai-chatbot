@@ -118,3 +118,14 @@ export async function renameChat(
   );
   if (matchedCount === 0) throw new ChatNotFoundError(chatId);
 }
+
+export async function deleteChat(
+  userId: string,
+  chatId: string,
+): Promise<void> {
+  if (!isValidObjectId(chatId)) throw new ChatNotFoundError(chatId);
+  await dbConnect();
+
+  const { deletedCount } = await Chat.deleteOne({ _id: chatId, userId });
+  if (deletedCount === 0) throw new ChatNotFoundError(chatId);
+}
