@@ -1,14 +1,19 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PATCH } from "@/app/api/chats/[id]/route";
+import { DELETE, PATCH } from "@/app/api/chats/[id]/route";
 import { getSession } from "@/lib/auth/jwt";
-import { ChatNotFoundError, renameChat } from "@/lib/chat/chat-service";
+import {
+  ChatNotFoundError,
+  deleteChat,
+  renameChat,
+} from "@/lib/chat/chat-service";
 
 vi.mock("@/lib/auth/jwt", () => ({ getSession: vi.fn() }));
 vi.mock("@/lib/chat/chat-service", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/chat/chat-service")>()),
   renameChat: vi.fn(),
+  deleteChat: vi.fn(),
 }));
 
 function renameRequest(body: object) {
@@ -71,5 +76,44 @@ describe("PATCH /api/chats/[id]", () => {
 
     expect(response.status).toBe(400);
     expect(renameChat).not.toHaveBeenCalled();
+  });
+});
+
+describe("DELETE /api/chats/[id]", () => {
+  const deleteRequest = () =>
+    new NextRequest("http://localhost/api/chats/chat-1", { method: "DELETE" });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getSession).mockResolvedValue({
+      id: "user-1",
+      email: "jane@acme.com",
+      firstName: "Jane",
+      lastName: "Smith",
+    });
+  });
+
+  it("deletes the chat", async () => {
+    const response = await DELETE(deleteRequest(), context);
+
+    expect(response.status).toBe(204);
+    expect(deleteChat).toHaveBeenCalledWith("user-1", "chat-1");
+  });
+
+  it("returns 401 without a session", async () => {
+    vi.mocked(getSession).mockResolvedValue(null);
+
+    const response = await DELETE(deleteRequest(), context);
+
+    expect(response.status).toBe(401);
+    expect(deleteChat).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 for a chat the user does not own", async () => {
+    vi.mocked(deleteChat).mockRejectedValue(new ChatNotFoundError("chat-1"));
+
+    const response = await DELETE(deleteRequest(), context);
+
+    expect(response.status).toBe(404);
   });
 });

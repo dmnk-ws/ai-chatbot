@@ -1,13 +1,16 @@
 "use client";
 
-import { EllipsisVertical, Pencil } from "lucide-react";
+import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
-import React, { KeyboardEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { KeyboardEvent, useCallback, useRef, useState } from "react";
 
+import Button from "@/components/elements/Button";
 import Input from "@/components/elements/Input";
 import Menu from "@/components/elements/Menu";
+import Modal from "@/components/elements/Modal";
 import { useChatHistory } from "@/contexts/ChatHistoryContext";
-import { renameChatApi } from "@/lib/chat/chat-api";
+import { deleteChatApi, renameChatApi } from "@/lib/chat/chat-api";
 import { normalizeTitle } from "@/lib/chat/title";
 import type { ChatSummary } from "@/lib/db/models/Chat";
 
@@ -18,9 +21,13 @@ interface ChatHistoryItemProps {
 }
 
 function ChatHistoryItem({ chat, isActive, onNavigate }: ChatHistoryItemProps) {
-  const { renameChat } = useChatHistory();
+  const router = useRouter();
+  const { renameChat, removeChat, startNewChat } = useChatHistory();
   const [draft, setDraft] = useState<string | null>(null);
   const isEditingRef = useRef(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const startRename = () => {
     isEditingRef.current = true;
@@ -47,6 +54,29 @@ function ChatHistoryItem({ chat, isActive, onNavigate }: ChatHistoryItemProps) {
     } catch {
       renameChat(chat.id, previousTitle);
     }
+  };
+
+  const closeDeleteConfirm = useCallback(() => {
+    setIsConfirmingDelete(false);
+    setDeleteError(null);
+  }, []);
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteChatApi(chat.id);
+    } catch {
+      setDeleteError("Couldn't delete the chat. Please try again.");
+      setIsDeleting(false);
+      return;
+    }
+
+    if (isActive) {
+      startNewChat();
+      router.push("/new");
+    }
+    removeChat(chat.id);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -103,9 +133,37 @@ function ChatHistoryItem({ chat, isActive, onNavigate }: ChatHistoryItemProps) {
               icon: <Pencil className="w-4 h-4" />,
               onSelect: startRename,
             },
+            {
+              label: "Delete",
+              icon: <Trash className="w-4 h-4" />,
+              onSelect: () => setIsConfirmingDelete(true),
+              danger: true,
+            },
           ]}
         />
       </div>
+      <Modal
+        open={isConfirmingDelete}
+        onClose={closeDeleteConfirm}
+        title="Delete chat?"
+        actions={
+          <>
+            <Button variant="secondary" onClick={closeDeleteConfirm}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              disabled={isDeleting}
+              onClick={confirmDelete}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p>&ldquo;{chat.title}&rdquo; will be permanently deleted.</p>
+        {deleteError && <p className="mt-2 text-red-600">{deleteError}</p>}
+      </Modal>
     </li>
   );
 }

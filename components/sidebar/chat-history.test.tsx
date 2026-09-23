@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import ChatHistory from "@/components/sidebar/chat-history";
 import { server } from "@/test/msw";
-import { navigate } from "@/test/navigation";
+import { navigate, router } from "@/test/navigation";
 import { renderWithProviders } from "@/test/render";
 
 vi.mock("next/navigation", () => import("@/test/navigation"));
@@ -152,6 +152,94 @@ describe("ChatHistory", () => {
       await waitFor(() =>
         expect(titles()).toEqual(["Recipes", "Travel plans"]),
       );
+    });
+  });
+
+  describe("deleting", () => {
+    function mockDelete(status = 204) {
+      const deleted: string[] = [];
+      server.use(
+        http.delete("*/api/chats/:id", ({ params }) => {
+          deleted.push(params.id as string);
+          return status === 204
+            ? new HttpResponse(null, { status })
+            : HttpResponse.json({ error: "Failed" }, { status });
+        }),
+      );
+      return deleted;
+    }
+
+    async function openDeleteDialog(title: string) {
+      await renderWithProviders(<ChatHistory />, {
+        loggedIn: true,
+        chats: CHATS,
+      });
+      const row = screen.getByRole("link", { name: title }).closest("li")!;
+      fireEvent.click(
+        within(row).getByRole("button", { name: "Chat options" }),
+      );
+      fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
+      return screen.getByRole("dialog", { name: "Delete chat?" });
+    }
+
+    function titles() {
+      return screen.getAllByRole("link").map((link) => link.textContent);
+    }
+
+    it("asks for confirmation", async () => {
+      const dialog = await openDeleteDialog("Recipes");
+
+      expect(dialog.textContent).toContain(
+        "\u201cRecipes\u201d will be permanently deleted.",
+      );
+    });
+
+    it("keeps the chat when cancelled", async () => {
+      const deleted = mockDelete();
+      const dialog = await openDeleteDialog("Recipes");
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(titles()).toEqual(["Recipes", "Travel plans"]);
+      expect(deleted).toEqual([]);
+    });
+
+    it("removes the chat when confirmed", async () => {
+      const deleted = mockDelete();
+      const dialog = await openDeleteDialog("Recipes");
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
+
+      await waitFor(() => expect(titles()).toEqual(["Travel plans"]));
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(deleted).toEqual(["a"]);
+      expect(router.push).not.toHaveBeenCalled();
+    });
+
+    it("starts a new chat when deleting the open one", async () => {
+      mockDelete();
+      navigate("/chat/b");
+      const dialog = await openDeleteDialog("Travel plans");
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
+
+      await waitFor(() => expect(router.push).toHaveBeenCalledWith("/new"));
+      expect(titles()).toEqual(["Recipes"]);
+    });
+
+    it("keeps the dialog open when deleting fails", async () => {
+      mockDelete(500);
+      const dialog = await openDeleteDialog("Recipes");
+
+      fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
+
+      expect(
+        await within(dialog).findByText(
+          "Couldn't delete the chat. Please try again.",
+        ),
+      ).toBeTruthy();
+      expect(titles()).toEqual(["Recipes", "Travel plans"]);
     });
   });
 });
