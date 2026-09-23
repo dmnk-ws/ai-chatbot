@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 
-import { getProvider } from "@/lib/ai/core/provider-registry";
+import {
+  UnknownProviderError,
+  getProvider,
+} from "@/lib/ai/core/provider-registry";
 import type { ProviderName } from "@/lib/ai/types";
 
 export async function POST(req: NextRequest) {
@@ -21,7 +24,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error(error);
 
-    if (error instanceof Error && error.message.includes("Provider")) {
+    if (error instanceof UnknownProviderError) {
       return new Response(
         JSON.stringify({ error: `Provider ${provider} not found` }),
         {

@@ -23,7 +23,4 @@ export enum Provider {
 }
 
 export type ProviderName =
-  | Provider.ANTHROPIC
-  | Provider.OPENAI
-  | Provider.MISTRAL
-  | Provider.XAI;
+  Provider.ANTHROPIC | Provider.OPENAI | Provider.MISTRAL | Provider.XAI;

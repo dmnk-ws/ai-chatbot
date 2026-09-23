@@ -5,7 +5,7 @@ import ModelSelect from "@/components/chat/model-select";
 import Button from "@/components/elements/Button";
 
 interface ChatFormProps {
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  handleSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
   handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleEnter: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   input: string;

@@ -19,16 +19,19 @@ export abstract class BaseProvider {
   public async chat(
     model: string,
     messages: Message[],
-    stream?: boolean,
+    stream: boolean = false,
   ): Promise<ReadableStream> {
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    const response = await fetch(`${this.baseUrl}${this.getEndpoint()}`, {
       method: "POST",
-      body: JSON.stringify({ model, messages, stream }),
+      body: JSON.stringify(this.buildBody(model, messages, stream)),
       headers: this.headers,
-    }).catch((e) => console.error("An error occurred", e));
+    });
 
-    if (!response || !response.ok || !response.body)
-      throw new Error("Fetching error");
+    if (!response.ok || !response.body) {
+      throw new Error(
+        `${this.constructor.name} ${response.status}: ${await response.text()}`,
+      );
+    }
 
     return this.pipe(response.body);
   }
@@ -37,8 +40,26 @@ export abstract class BaseProvider {
 
   protected abstract getAuthHeaders(): Record<string, string>;
 
+  protected getEndpoint(): string {
+    return "/chat/completions";
+  }
+
+  protected buildBody(
+    model: string,
+    messages: Message[],
+    stream: boolean,
+  ): object {
+    return { model, messages, stream };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected parseChunk(data: any): string {
+    return data.choices?.[0]?.delta?.content || "";
+  }
+
   protected pipe(response: ReadableStream): ReadableStream {
     let buffer = "";
+    const parse = this.parseChunk.bind(this);
 
     return response
       .pipeThrough(new TextDecoderStream())
@@ -55,8 +76,7 @@ export abstract class BaseProvider {
                 const data = line.slice(6).trim();
 
                 if (data && data !== "[DONE]") {
-                  const parsed = JSON.parse(data);
-                  const content = parsed.choices?.[0]?.delta?.content || "";
+                  const content = parse(JSON.parse(data));
 
                   if (content) controller.enqueue(content);
                 }

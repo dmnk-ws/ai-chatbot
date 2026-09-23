@@ -2,33 +2,28 @@ import { BaseProvider } from "@/lib/ai/core/base-provider";
 import type { Message } from "@/lib/ai/types";
 
 export class GrokProvider extends BaseProvider {
-  public async chat(
-    model: string = "grok-4.20-reasoning",
-    messages: Message[] = [],
-    stream: boolean = false,
-  ): Promise<ReadableStream> {
-    const response = await fetch(`${this.baseUrl}/v1/responses`, {
-      method: "POST",
-      body: JSON.stringify({
-        model,
-        input: messages,
-        stream,
-        store: false,
-      }),
-      headers: this.headers,
-    }).catch((e) => console.error("An error occurred", e));
-
-    if (!response || !response.ok || !response.body)
-      throw new Error("Fetching error");
-
-    return this.pipe(response.body);
-  }
-
   protected getAuthHeaders(): Record<string, string> {
     return { Authorization: `Bearer ${process.env.XAI_API_KEY || ""}` };
   }
 
   protected getBaseURL(): string {
     return "https://api.x.ai";
+  }
+
+  protected getEndpoint(): string {
+    return "/v1/responses";
+  }
+
+  protected buildBody(
+    model: string,
+    messages: Message[],
+    stream: boolean,
+  ): object {
+    return { model, input: messages, stream, store: false };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected parseChunk(data: any): string {
+    return data.type === "response.output_text.delta" ? data.delta || "" : "";
   }
 }

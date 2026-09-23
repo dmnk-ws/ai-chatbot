@@ -5,20 +5,26 @@ import { MistralProvider } from "@/lib/ai/providers/mistral";
 import { OpenAIProvider } from "@/lib/ai/providers/openai";
 import { Provider, ProviderName } from "@/lib/ai/types";
 
+export class UnknownProviderError extends Error {
+  constructor(name: string) {
+    super(`Provider ${name} not found`);
+  }
+}
+
 const providerCache = new Map<ProviderName, BaseProvider>();
 
 function createProvider(name: ProviderName): BaseProvider {
   switch (name) {
     case Provider.ANTHROPIC:
-      return new AnthropicProvider({
-        headers: { "anthropic-version": "2023-06-01" },
-      });
+      return new AnthropicProvider();
     case Provider.OPENAI:
       return new OpenAIProvider();
     case Provider.MISTRAL:
       return new MistralProvider();
     case Provider.XAI:
       return new GrokProvider();
+    default:
+      throw new UnknownProviderError(name);
   }
 }
 
