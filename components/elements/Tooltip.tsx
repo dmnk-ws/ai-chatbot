@@ -72,7 +72,9 @@ export default function Tooltip({
       className="contents"
       onMouseEnter={show}
       onMouseLeave={hide}
-      onFocus={show}
+      onFocus={(e) => {
+        if (e.target.matches(":focus-visible")) show();
+      }}
       onBlur={hide}
     >
       {children}
