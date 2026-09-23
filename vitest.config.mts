@@ -30,7 +30,7 @@ export default defineConfig({
             "app/**/*.test.tsx",
           ],
           exclude: ["app/api/**"],
-          setupFiles: ["test/setup.ts"],
+          setupFiles: ["test/setup.ts", "test/setup-browser.ts"],
         },
       },
       {
