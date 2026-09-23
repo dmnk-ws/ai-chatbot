@@ -7,7 +7,11 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "test": "vitest",
+    "test:node": "vitest --project node",
+    "test:browser": "vitest --project browser",
+    "test:live": "LIVE=1 vitest run --project live"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -22,17 +26,24 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^30.1.1",
+    "msw": "^2.15.0",
     "prettier": "3.9.9",
     "tailwindcss": "^4",
-    "typescript": "^6"
+    "typescript": "^6",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^5.0.1"
   }
 }
