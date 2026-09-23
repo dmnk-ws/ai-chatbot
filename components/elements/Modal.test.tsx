@@ -41,12 +41,20 @@ describe("Modal", () => {
     expect(dialog.textContent).toContain("This cannot be undone.");
   });
 
-  it("moves focus to the first action", () => {
+  it("moves focus to the close button", () => {
     renderModal();
 
     expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: "Cancel" }),
+      screen.getByRole("button", { name: "Close" }),
     );
+  });
+
+  it("closes via the close button", () => {
+    const onClose = renderModal();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
   it("closes on Escape", () => {
